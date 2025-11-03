@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Constitucionalidade - Direito Constitucional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --primary-blue-dark: #002171;
+            --accent-orange: #ff9800;
+            --accent-green: #4caf50;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-dark: #212121;
+            --text-light: #757575;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        [data-theme="dark"] {
+            --primary-blue: #1976d2;
+            --primary-blue-dark: #0d47a1;
+            --bg-light: #1a1a1a;
+            --bg-white: #2d2d2d;
+            --text-dark: #e0e0e0;
+            --text-light: #b0b0b0;
+            --border-color: #424242;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .progress-container {
+            margin-top: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-green);
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 120px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 120px);
+            background: var(--bg-white);
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-light);
+        }
+
+        .menu-item.active {
+            background: var(--bg-light);
+            border-left-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item input[type="checkbox"] {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 120px;
+            padding: 2rem;
+            min-height: calc(100vh - 120px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .card-header h2 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+
+        .card.expanded .card-content {
+            max-height: 5000px;
+        }
+
+        .card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .expand-icon {
+            transition: transform 0.3s;
+            color: var(--text-light);
+        }
+
+        /* Special Cards */
+        .highlight-card {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #f57c00 100%);
+            color: white;
+            border: none;
+            padding: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .highlight-card h2 {
+            color: white;
+        }
+
+        .mnemonic-card {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #2e7d32 100%);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 2rem 0;
+        }
+
+        .mnemonic-card h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mnemonic-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .mnemonic-group {
+            background: rgba(255,255,255,0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .mnemonic-group h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .mnemonic-group ul {
+            list-style: none;
+        }
+
+        .mnemonic-group li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .mnemonic-group li:last-child {
+            border-bottom: none;
+        }
+
+        /* Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .comparison-table table {
+            width: 100%;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--primary-blue);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .timeline-item {
+            padding: 1rem 0 1rem 2rem;
+            border-left: 3px solid var(--primary-blue);
+            position: relative;
+            margin-left: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+        }
+
+        .timeline-item h3 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quiz */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-start {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .quiz-start h2 {
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-start p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+        }
+
+        .btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .question-card {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .options {
+            list-style: none;
+        }
+
+        .option {
+            background: var(--bg-light);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: var(--border-color);
+        }
+
+        .option.selected {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .option.correct {
+            background: var(--accent-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .explanation {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary-blue);
+            display: none;
+        }
+
+        [data-theme="dark"] .explanation {
+            background: #1a237e;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .quiz-results {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            font-size: 3rem;
+            font-weight: 600;
+        }
+
+        .score-circle small {
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mnemonic-groups {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Emphasis */
+        strong {
+            color: var(--primary-blue);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .badge-info {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .info-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--accent-orange);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] .info-box {
+            background: #4a2c00;
+        }
+
+        .flowchart {
+            background: var(--bg-light);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .flowchart-step {
+            background: var(--bg-white);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .flowchart-step h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1><i class="fas fa-balance-scale"></i> Controle de Constitucionalidade - Direito Constitucional</h1>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i> Tema
+            </button>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="intro" onclick="navigateToSection('intro')">
+                    <i class="fas fa-home"></i>
+                    <span>Introdução</span>
+                </li>
+                <li class="menu-item" data-section="constituicao" onclick="navigateToSection('constituicao')">
+                    <i class="fas fa-book"></i>
+                    <span>Constituição</span>
+                    <input type="checkbox" class="section-check" data-section="constituicao" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="supremacia" onclick="navigateToSection('supremacia')">
+                    <i class="fas fa-crown"></i>
+                    <span>Supremacia Constitucional</span>
+                    <input type="checkbox" class="section-check" data-section="supremacia" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="poder-constituinte" onclick="navigateToSection('poder-constituinte')">
+                    <i class="fas fa-gavel"></i>
+                    <span>Poder Constituinte</span>
+                    <input type="checkbox" class="section-check" data-section="poder-constituinte" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="vicios" onclick="navigateToSection('vicios')">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Vícios de Constitucionalidade</span>
+                    <input type="checkbox" class="section-check" data-section="vicios" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="controle-difuso" onclick="navigateToSection('controle-difuso')">
+                    <i class="fas fa-random"></i>
+                    <span>Controle Difuso</span>
+                    <input type="checkbox" class="section-check" data-section="controle-difuso" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="controle-concentrado" onclick="navigateToSection('controle-concentrado')">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Controle Concentrado</span>
+                    <input type="checkbox" class="section-check" data-section="controle-concentrado" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="modelo-brasileiro" onclick="navigateToSection('modelo-brasileiro')">
+                    <i class="fas fa-flag"></i>
+                    <span>Modelo Brasileiro</span>
+                    <input type="checkbox" class="section-check" data-section="modelo-brasileiro" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="tipos-controle" onclick="navigateToSection('tipos-controle')">
+                    <i class="fas fa-list"></i>
+                    <span>Tipos de Controle</span>
+                    <input type="checkbox" class="section-check" data-section="tipos-controle" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="legitimados" onclick="navigateToSection('legitimados')">
+                    <i class="fas fa-users"></i>
+                    <span>Legitimados (Art. 103)</span>
+                    <input type="checkbox" class="section-check" data-section="legitimados" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="adi" onclick="navigateToSection('adi')">
+                    <i class="fas fa-file-contract"></i>
+                    <span>ADI</span>
+                    <input type="checkbox" class="section-check" data-section="adi" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="adc" onclick="navigateToSection('adc')">
+                    <i class="fas fa-check-circle"></i>
+                    <span>ADC</span>
+                    <input type="checkbox" class="section-check" data-section="adc" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="adpf" onclick="navigateToSection('adpf')">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>ADPF</span>
+                    <input type="checkbox" class="section-check" data-section="adpf" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="ado" onclick="navigateToSection('ado')">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>ADO</span>
+                    <input type="checkbox" class="section-check" data-section="ado" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="mi" onclick="navigateToSection('mi')">
+                    <i class="fas fa-hand-paper"></i>
+                    <span>Mandado de Injunção</span>
+                    <input type="checkbox" class="section-check" data-section="mi" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="efeitos" onclick="navigateToSection('efeitos')">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Efeitos das Decisões</span>
+                    <input type="checkbox" class="section-check" data-section="efeitos" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="comparacao" onclick="navigateToSection('comparacao')">
+                    <i class="fas fa-table"></i>
+                    <span>Tabela Comparativa</span>
+                    <input type="checkbox" class="section-check" data-section="comparacao" onclick="event.stopPropagation(); updateProgress()">
+                </li>
+                <li class="menu-item" data-section="quiz" onclick="navigateToSection('quiz')">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quiz (30 Questões)</span>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Intro Section -->
+        <section id="intro" class="section active">
+            <div class="card highlight-card expanded">
+                <div class="card-header">
+                    <h2><i class="fas fa-graduation-cap"></i> Bem-vindo ao Estudo de Controle de Constitucionalidade</h2>
+                </div>
+                <div class="card-content">
+                    <p>Este material completo foi desenvolvido para auxiliar no estudo sistemático do <strong>Controle de Constitucionalidade</strong> no Direito Constitucional Brasileiro.</p>
+                    <p>Você encontrará:</p>
+                    <ul>
+                        <li><strong>16 seções teóricas</strong> organizadas por aulas</li>
+                        <li><strong>Temas prioritários</strong> da Aula 8 (ADI, ADC, ADPF, ADO, MI)</li>
+                        <li><strong>Mnemônico visual</strong> para memorização dos legitimados</li>
+                        <li><strong>Tabelas comparativas</strong> e infográficos</li>
+                        <li><strong>Quiz interativo</strong> com 30 questões</li>
+                        <li><strong>Sistema de progresso</strong> para acompanhar seus estudos</li>
+                    </ul>
+                    <p><strong>Como usar:</strong> Navegue pelo menu lateral, expanda os cards para estudar o conteúdo, marque as seções como concluídas e teste seus conhecimentos no quiz!</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h2 style="color: var(--primary-blue); margin-bottom: 1rem;"><i class="fas fa-history"></i> Evolução Histórica do Controle</h2>
+                <div class="timeline-item">
+                    <h3>1803 - Estados Unidos</h3>
+                    <p><strong>Caso Marbury vs Madison</strong> - Juiz Marshall cria o controle difuso de constitucionalidade. Qualquer juiz pode declarar inconstitucionalidade.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>1920 - Áustria</h3>
+                    <p><strong>Sistema Austríaco</strong> - Criação do controle concentrado. Tribunal Constitucional específico para o controle.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>1988 - Brasil</h3>
+                    <p><strong>Constituição Federal</strong> - Adota sistema MISTO/HÍBRIDO, combinando controle difuso e concentrado com o STF como guardião.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Constituição -->
+        <section id="constituicao" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-book"></i> Constituição - Conceitos e Classificações</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>A Constituição é a <strong>lei fundamental e suprema</strong> de um Estado, que organiza os poderes públicos e estabelece os direitos e garantias fundamentais dos cidadãos.</p>
+                    
+                    <h3>Classificação da CF/88</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Promulgada</h4>
+                            <p>Elaborada democraticamente por representantes do povo (Assembleia Constituinte).</p>
+                        </div>
+                        <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-file-alt"></i> Escrita/Formal</h4>
+                            <p>Registrada em documento solene e codificado.</p>
+                        </div>
+                        <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-lock"></i> Rígida</h4>
+                            <p>Exige processo especial para alteração (art. 60 - Emenda Constitucional).</p>
+                        </div>
+                        <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-lightbulb"></i> Dogmática</h4>
+                            <p>Baseada em princípios e dogmas fundamentais estabelecidos de forma racional.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-info-circle"></i> Importante:</strong> A rigidez constitucional é o fundamento do controle de constitucionalidade! Se a Constituição fosse flexível, qualquer lei poderia modificá-la.
+                    </div>
+
+                    <h3>Outras Classificações Importantes</h3>
+                    <ul>
+                        <li><strong>Quanto à extensão:</strong> Analítica (detalhada, extensa)</li>
+                        <li><strong>Quanto à origem:</strong> Democrática/Popular</li>
+                        <li><strong>Quanto à forma:</strong> Codificada (texto único)</li>
+                        <li><strong>Quanto ao modo de elaboração:</strong> Dogmática (feita em momento específico)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supremacia Constitucional -->
+        <section id="supremacia" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-crown"></i> Supremacia Constitucional</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Princípio Fundamental</h3>
+                    <p>A <strong>Constituição é a norma suprema</strong> do ordenamento jurídico. Todas as demais normas devem estar em conformidade com ela, sob pena de serem declaradas inconstitucionais.</p>
+
+                    <h3>Hierarquia das Normas (Pirâmide de Kelsen)</h3>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <div style="background: #ffd700; padding: 1rem; margin: 0 20%; border-radius: 8px;">
+                            <strong>CONSTITUIÇÃO FEDERAL</strong>
+                        </div>
+                        <div style="background: var(--accent-orange); padding: 1rem; margin: 0.5rem 15%; border-radius: 8px; color: white;">
+                            <strong>Leis Complementares e Ordinárias</strong>
+                        </div>
+                        <div style="background: var(--primary-blue); padding: 1rem; margin: 0.5rem 10%; border-radius: 8px; color: white;">
+                            <strong>Decretos</strong>
+                        </div>
+                        <div style="background: var(--text-light); padding: 1rem; margin: 0.5rem 5%; border-radius: 8px; color: white;">
+                            <strong>Resoluções, Portarias, etc.</strong>
+                        </div>
+                    </div>
+
+                    <h3>Consequências da Supremacia</h3>
+                    <ul>
+                        <li><strong>Rigidez constitucional:</strong> Processo especial para alteração</li>
+                        <li><strong>Controle de constitucionalidade:</strong> Poder de verificar conformidade das leis</li>
+                        <li><strong>Nulidade:</strong> Leis inconstitucionais são nulas (não produzem efeitos)</li>
+                        <li><strong>Vinculação:</strong> Todos os poderes públicos estão vinculados à Constituição</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-exclamation-circle"></i> Fundamental:</strong> A supremacia constitucional justifica a existência do controle de constitucionalidade como mecanismo de proteção da ordem constitucional.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Poder Constituinte -->
+        <section id="poder-constituinte" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-gavel"></i> Poder Constituinte</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Conceito</h3>
+                    <p>É o poder de elaborar e reformar a Constituição. Divide-se em <strong>Originário</strong> e <strong>Derivado</strong>.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
+                        <div style="background: var(--accent-green); color: white; padding: 1.5rem; border-radius: 8px;">
+                            <h3><i class="fas fa-star"></i> Poder Constituinte ORIGINÁRIO</h3>
+                            <p><strong>Conceito:</strong> Poder ilimitado de criar nova Constituição</p>
+                            <h4 style="margin-top: 1rem;">Características:</h4>
+                            <ul>
+                                <li><span class="badge badge-success">Extraordinário</span> - Não é permanente</li>
+                                <li><span class="badge badge-success">Inicial</span> - Inicia nova ordem jurídica</li>
+                                <li><span class="badge badge-success">Ilimitado</span> - Sem limites jurídicos</li>
+                                <li><span class="badge badge-success">Autônomo</span> - Define seu conteúdo</li>
+                                <li><span class="badge badge-success">Soberano</span> - Poder supremo</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: var(--primary-blue); color: white; padding: 1.5rem; border-radius: 8px;">
+                            <h3><i class="fas fa-edit"></i> Poder Constituinte DERIVADO</h3>
+                            <p><strong>Conceito:</strong> Poder limitado de reformar a Constituição existente</p>
+                            <h4 style="margin-top: 1rem;">Tipos:</h4>
+                            <ul>
+                                <li><span class="badge badge-info">Reformador</span> - Emendas Constitucionais (art. 60)</li>
+                                <li><span class="badge badge-info">Revisor</span> - Revisão constitucional (1993 - 6 emendas)</li>
+                                <li><span class="badge badge-info">Decorrente</span> - Constituições estaduais e leis orgânicas municipais</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Limitações ao Poder Derivado Reformador (Art. 60 CF)</h3>
+                    <ul>
+                        <li><strong>Cláusulas Pétreas:</strong> Não podem ser abolidas (forma federativa, voto direto, separação de poderes, direitos fundamentais)</li>
+                        <li><strong>Circunstanciais:</strong> Não pode emendar durante intervenção federal, estado de defesa ou estado de sítio</li>
+                        <li><strong>Procedimentais:</strong> Aprovação em 2 turnos, 3/5 dos votos em cada casa</li>
+                        <li><strong>Temporais:</strong> Proposta rejeitada só pode ser reapresentada na sessão seguinte</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vícios de Constitucionalidade -->
+        <section id="vicios" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Vícios de Constitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Tipos de Inconstitucionalidade</h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
+                        <div style="background: #ffebee; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f44336;">
+                            <h3 style="color: #c62828;"><i class="fas fa-times-circle"></i> Inconstitucionalidade MATERIAL</h3>
+                            <p><strong>Conceito:</strong> Desrespeito ao <strong>conteúdo material</strong> da Constituição</p>
+                            <h4>Exemplos:</h4>
+                            <ul>
+                                <li>Lei que discrimina por gênero ou raça</li>
+                                <li>Lei que viola liberdade de expressão</li>
+                                <li>Lei que fere direitos fundamentais</li>
+                                <li>Norma contrária aos princípios constitucionais</li>
+                            </ul>
+                            <div style="background: #c62828; color: white; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
+                                <strong>Vício de CONTEÚDO</strong> - O QUE diz a lei
+                            </div>
+                        </div>
+
+                        <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #1976d2;">
+                            <h3 style="color: #0d47a1;"><i class="fas fa-exclamation-circle"></i> Inconstitucionalidade FORMAL</h3>
+                            <p><strong>Conceito:</strong> Violação do <strong>processo</strong> ou <strong>competência</strong> legislativa</p>
+                            
+                            <h4><span class="badge badge-info">ORGÂNICA</span> - Vício de Competência</h4>
+                            <p><strong>Exemplo:</strong> Município legislar sobre direito penal (competência da União)</p>
+                            
+                            <h4><span class="badge badge-info">PROCEDIMENTAL</span> - Vício de Procedimento</h4>
+                            <p><strong>Exemplo:</strong> Lei aprovada sem quórum necessário ou sem votação adequada</p>
+                            
+                            <div style="background: #1976d2; color: white; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
+                                <strong>Vício de FORMA</strong> - COMO foi feita a lei
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-lightbulb"></i> Dica para memorizar:</strong><br>
+                        <strong>MATERIAL</strong> = O QUE a lei diz (conteúdo)<br>
+                        <strong>FORMAL ORGÂNICA</strong> = QUEM fez a lei (competência)<br>
+                        <strong>FORMAL PROCEDIMENTAL</strong> = COMO foi feita a lei (processo)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controle Difuso -->
+        <section id="controle-difuso" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-random"></i> Controle Difuso de Constitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p><strong>Qualquer juiz ou tribunal</strong> pode declarar a inconstitucionalidade de lei ou ato normativo <strong>incidentalmente</strong> em caso concreto.</p>
+
+                    <h3>Características Principais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="card">
+                            <h4><i class="fas fa-globe-americas"></i> Origem</h4>
+                            <p><strong>Sistema Americano</strong> (EUA - 1803)</p>
+                            <p>Caso Marbury vs Madison</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-user-tie"></i> Legitimados</h4>
+                            <p><strong>Qualquer juiz ou tribunal</strong></p>
+                            <p>Controle descentralizado</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-hourglass-start"></i> Quando</h4>
+                            <p><strong>Incidenter tantum</strong></p>
+                            <p>Incidentalmente no caso concreto</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-users"></i> Efeito Espacial</h4>
+                            <p><strong>Inter partes</strong></p>
+                            <p>Apenas entre as partes do processo</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-history"></i> Efeito Temporal</h4>
+                            <p><strong>Ex tunc</strong></p>
+                            <p>Retroativo (desde o início)</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-unlink"></i> Vinculação</h4>
+                            <p><strong>Não vinculante</strong></p>
+                            <p>Não obriga outros juízes</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-info-circle"></i> Importante:</strong> No controle difuso, a questão constitucional é causa de pedir (questão prejudicial), não o pedido principal. O juiz decide a questão constitucional para resolver o caso concreto.
+                    </div>
+
+                    <h3>Cláusula de Reserva de Plenário (Art. 97 CF)</h3>
+                    <p>Nos tribunais, a declaração de inconstitucionalidade exige <strong>maioria absoluta dos membros do tribunal ou do órgão especial</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controle Concentrado -->
+        <section id="controle-concentrado" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-bullseye"></i> Controle Concentrado de Constitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p><strong>Órgão específico</strong> (STF) declara a inconstitucionalidade de lei ou ato normativo em <strong>ação própria</strong>.</p>
+
+                    <h3>Características Principais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="card">
+                            <h4><i class="fas fa-map-marked-alt"></i> Origem</h4>
+                            <p><strong>Sistema Austríaco</strong> (Europa - 1920)</p>
+                            <p>Tribunal Constitucional</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-user-shield"></i> Legitimados</h4>
+                            <p><strong>Apenas os do art. 103 CF</strong></p>
+                            <p>Controle centralizado</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-file-signature"></i> Quando</h4>
+                            <p><strong>Via ação específica</strong></p>
+                            <p>ADI, ADC, ADPF, ADO</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-globe"></i> Efeito Espacial</h4>
+                            <p><strong>Erga omnes</strong></p>
+                            <p>Para todos (efeitos gerais)</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-calendar-alt"></i> Efeito Temporal</h4>
+                            <p><strong>Ex nunc (REGRA)</strong></p>
+                            <p>Prospectivo (a partir da decisão)</p>
+                        </div>
+                        <div class="card">
+                            <h4><i class="fas fa-link"></i> Vinculação</h4>
+                            <p><strong>Vinculante</strong></p>
+                            <p>Vincula Administração e Judiciário</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-exclamation-circle"></i> Atenção:</strong> O STF pode modular os efeitos temporais por razões de segurança jurídica ou excepcional interesse social (2/3 dos membros). Assim, pode dar efeito ex tunc mesmo no controle concentrado.
+                    </div>
+
+                    <h3>Ações do Controle Concentrado</h3>
+                    <ul>
+                        <li><strong>ADI</strong> - Ação Direta de Inconstitucionalidade</li>
+                        <li><strong>ADC</strong> - Ação Declaratória de Constitucionalidade</li>
+                        <li><strong>ADPF</strong> - Arguição de Descumprimento de Preceito Fundamental</li>
+                        <li><strong>ADO</strong> - Ação Direta de Inconstitucionalidade por Omissão</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modelo Brasileiro -->
+        <section id="modelo-brasileiro" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-flag"></i> Modelo Brasileiro de Controle</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Sistema MISTO/HÍBRIDO</h3>
+                    <p>O Brasil adota um <strong>sistema misto</strong>, combinando elementos dos sistemas americano e austríaco.</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+                        <div style="background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center;">
+                            <h3><i class="fas fa-random"></i> CONTROLE DIFUSO</h3>
+                            <p style="margin: 1rem 0;">Sistema Americano</p>
+                            <ul style="text-align: left; list-style-position: inside;">
+                                <li>Qualquer juiz</li>
+                                <li>Caso concreto</li>
+                                <li>Inter partes</li>
+                                <li>Ex tunc</li>
+                            </ul>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center;">
+                            <h3><i class="fas fa-bullseye"></i> CONTROLE CONCENTRADO</h3>
+                            <p style="margin: 1rem 0;">Sistema Austríaco</p>
+                            <ul style="text-align: left; list-style-position: inside;">
+                                <li>Apenas STF</li>
+                                <li>Ação específica</li>
+                                <li>Erga omnes</li>
+                                <li>Ex nunc</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3><i class="fas fa-balance-scale"></i> STF - Guardião da Constituição</h3>
+                    <p>O <strong>Supremo Tribunal Federal</strong> é o guardião da Constituição no Brasil, exercendo tanto o controle difuso (em recursos) quanto o controle concentrado (em ações próprias).</p>
+
+                    <h3>Poder que Exerce o Controle</h3>
+                    <div class="card" style="background: var(--accent-green); color: white;">
+                        <h3><i class="fas fa-gavel"></i> PODER JUDICIÁRIO</h3>
+                        <p>No Brasil, o controle de constitucionalidade é exercido pelo <strong>Poder Judiciário</strong> (judicial review).</p>
+                        <ul>
+                            <li><strong>Preventivo:</strong> Comissão de Constituição e Justiça (Legislativo) pode rejeitar projeto inconstitucional</li>
+                            <li><strong>Repressivo:</strong> Juízes e tribunais (especialmente STF) declaram inconstitucionalidade</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tipos de Controle -->
+        <section id="tipos-controle" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-list"></i> Tipos de Controle</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        <div style="background: #e8f5e9; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+                            <h3 style="color: #2e7d32;"><i class="fas fa-shield-alt"></i> Controle PREVENTIVO</h3>
+                            <p><strong>Conceito:</strong> Exercido <strong>ANTES</strong> da lei ser sancionada</p>
+                            <h4>Quem realiza:</h4>
+                            <ul>
+                                <li><strong>Comissão de Constituição e Justiça (CCJ)</strong> - Rejeita projeto inconstitucional</li>
+                                <li><strong>Presidente da República</strong> - Veto por inconstitucionalidade</li>
+                            </ul>
+                            <h4>Eficácia:</h4>
+                            <p><strong>Evita</strong> que norma inconstitucional entre no ordenamento jurídico</p>
+                            <div style="background: #4caf50; color: white; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; text-align: center;">
+                                <strong>ANTES = PREVENTIVO</strong>
+                            </div>
+                        </div>
+
+                        <div style="background: #ffebee; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f44336;">
+                            <h3 style="color: #c62828;"><i class="fas fa-times-circle"></i> Controle REPRESSIVO</h3>
+                            <p><strong>Conceito:</strong> Exercido <strong>DEPOIS</strong> da lei ser sancionada</p>
+                            <h4>Quem realiza:</h4>
+                            <ul>
+                                <li><strong>Poder Judiciário</strong> - Juízes e tribunais</li>
+                                <li><strong>STF</strong> - Declaração de inconstitucionalidade (ADI, ADC, ADPF, ADO)</li>
+                            </ul>
+                            <h4>Eficácia:</h4>
+                            <p><strong>Remove</strong> lei inconstitucional do ordenamento jurídico</p>
+                            <div style="background: #f44336; color: white; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; text-align: center;">
+                                <strong>DEPOIS = REPRESSIVO</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <strong><i class="fas fa-lightbulb"></i> Dica:</strong> O controle PREVENTIVO é exceção no Brasil. A regra é o controle REPRESSIVO pelo Poder Judiciário.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legitimados Art. 103 -->
+        <section id="legitimados" class="section">
+            <div class="mnemonic-card">
+                <h2><i class="fas fa-star"></i> MNEMÔNICO DOS LEGITIMADOS (Art. 103 CF)</h2>
+                <h1 style="font-size: 2.5rem; margin: 1rem 0;">3 PESSOAS, 3 MESAS, 3 INSTITUIÇÕES</h1>
+                
+                <div class="mnemonic-groups">
+                    <div class="mnemonic-group">
+                        <h3><i class="fas fa-user"></i> 3 PESSOAS</h3>
+                        <ul>
+                            <li><strong>Presidente da República</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                            <li><strong>Governador de Estado/DF</strong> *<br><span class="badge badge-warning">ESPECIAL</span></li>
+                            <li><strong>Procurador-Geral da República</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="mnemonic-group">
+                        <h3><i class="fas fa-table"></i> 3 MESAS</h3>
+                        <ul>
+                            <li><strong>Mesa do Senado Federal</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                            <li><strong>Mesa da Câmara dos Deputados</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                            <li><strong>Mesa de Assembleia Legislativa/DF</strong> *<br><span class="badge badge-warning">ESPECIAL</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="mnemonic-group">
+                        <h3><i class="fas fa-building"></i> 3 INSTITUIÇÕES</h3>
+                        <ul>
+                            <li><strong>Conselho Federal da OAB</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                            <li><strong>Partido Político com representação no CN</strong><br><span class="badge badge-success">UNIVERSAL</span></li>
+                            <li><strong>Confederação Sindical/Entidade de Classe</strong> *<br><span class="badge badge-warning">ESPECIAL</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.3); padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+                    <h3><i class="fas fa-exclamation-triangle"></i> ATENÇÃO - Os 3 com ASTERISCO (*)</h3>
+                    <p style="font-size: 1.2rem;"><strong>Governador, Mesa de Assembleia e Confederação Sindical</strong></p>
+                    <p style="font-size: 1.1rem;">Precisam demonstrar <strong>PERTINÊNCIA TEMÁTICA</strong> (Art. 97 CF)</p>
+                    <p>Ou seja: devem provar relação entre a lei questionada e seus interesses.</p>
+                </div>
+            </div>
+
+            <div class="card expanded" style="margin-top: 1.5rem;">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-info-circle"></i> Diferença entre Legitimados</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3><span class="badge badge-success">Legitimados UNIVERSAIS</span></h3>
+                    <p>Podem propor ADI sobre <strong>qualquer matéria</strong>, sem precisar demonstrar interesse específico.</p>
+                    <ul>
+                        <li>Presidente da República</li>
+                        <li>Procurador-Geral da República</li>
+                        <li>Mesa do Senado</li>
+                        <li>Mesa da Câmara</li>
+                        <li>OAB</li>
+                        <li>Partido Político com representação no Congresso</li>
+                    </ul>
+
+                    <h3><span class="badge badge-warning">Legitimados ESPECIAIS</span></h3>
+                    <p>Devem demonstrar <strong>pertinência temática</strong> - relação entre a lei questionada e seus interesses.</p>
+                    <ul>
+                        <li>Governador de Estado/DF *</li>
+                        <li>Mesa de Assembleia Legislativa/Câmara Legislativa DF *</li>
+                        <li>Confederação Sindical ou Entidade de Classe de âmbito nacional *</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADI -->
+        <section id="adi" class="section">
+            <div class="card highlight-card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-file-contract"></i> ADI - Ação Direta de Inconstitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>Ação constitucional para <strong>declarar a INCONSTITUCIONALIDADE</strong> de lei ou ato normativo federal ou estadual.</p>
+
+                    <h3>Características Essenciais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-bullseye"></i> Objetivo</h4>
+                            <p>Declarar lei ou ato normativo <strong>INCONSTITUCIONAL</strong></p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Legitimados</h4>
+                            <p><strong>Art. 103 CF</strong> (todos os 9 legitimados)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-landmark"></i> Competência</h4>
+                            <p><strong>STF</strong> (Supremo Tribunal Federal)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-file-signature"></i> Parecer AGU</h4>
+                            <p><strong>OBRIGATÓRIO</strong> (Art. 103, §3 - defende a lei)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-user-tie"></i> Ministério Público</h4>
+                            <p><strong>Deve intervir</strong> obrigatoriamente</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-history"></i> Efeito Temporal</h4>
+                            <p><strong>Ex tunc (REGRA)</strong> - Retroativo</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-globe"></i> Efeito Espacial</h4>
+                            <p><strong>Erga omnes</strong> - Para todos</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-link"></i> Vinculação</h4>
+                            <p><strong>Vinculante</strong> - Vincula todos</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-undo"></i> Repristinação</h4>
+                            <p><strong>SIM</strong> - Lei anterior volta a vigorar</p>
+                        </div>
+                    </div>
+
+                    <h3>Parecer da AGU (Art. 103, §3 CF)</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                        <p><strong><i class="fas fa-exclamation-circle"></i> IMPORTANTE:</strong> A Advocacia-Geral da União (AGU) <strong>DEVE</strong> se manifestar na ADI, defendendo a validade da lei ou ato normativo impugnado.</p>
+                        <p>É um papel de <strong>curador da presunção de constitucionalidade</strong> das leis.</p>
+                    </div>
+
+                    <h3>Tipos Especiais de ADI</h3>
+                    <ul>
+                        <li><strong>ADI Genérica:</strong> Questiona lei em abstrato</li>
+                        <li><strong>ADI Interventiva:</strong> Para intervenção federal em Estado</li>
+                        <li><strong>ADI por Omissão:</strong> Ver seção específica (ADO)</li>
+                    </ul>
+
+                    <h3>Efeito Repristinatório</h3>
+                    <p>Quando o STF declara uma lei inconstitucional, a <strong>lei anterior revogada</strong> por ela <strong>volta a vigorar</strong> automaticamente, salvo manifestação em contrário do STF.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADC -->
+        <section id="adc" class="section">
+            <div class="card highlight-card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-check-circle"></i> ADC - Ação Declaratória de Constitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>Ação constitucional para <strong>declarar a CONSTITUCIONALIDADE</strong> de lei ou ato normativo federal, diante de controvérsia judicial relevante.</p>
+
+                    <h3>Características Essenciais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-check"></i> Objetivo</h4>
+                            <p>Declarar lei ou ato normativo <strong>CONSTITUCIONAL</strong></p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Legitimados</h4>
+                            <p><strong>Apenas 3:</strong> Presidente, PGR, Mesa Senado, Mesa Câmara (EC 45/2004)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-landmark"></i> Competência</h4>
+                            <p><strong>STF</strong> (Supremo Tribunal Federal)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-file-signature"></i> Parecer AGU</h4>
+                            <p><strong>OBRIGATÓRIO</strong> (Art. 103, §3 - defende a lei)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-user-tie"></i> Ministério Público</h4>
+                            <p><strong>Sempre CONTRÁRIO</strong> à pretensão</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-calendar-alt"></i> Efeito Temporal</h4>
+                            <p><strong>Ex nunc</strong> - Prospectivo</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-globe"></i> Efeito Espacial</h4>
+                            <p><strong>Erga omnes</strong> - Para todos</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-link"></i> Vinculação</h4>
+                            <p><strong>Vinculante</strong> - Vincula todos</p>
+                        </div>
+                    </div>
+
+                    <h3>Diferenças em relação à ADI</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4><i class="fas fa-exchange-alt"></i> Principais Diferenças:</h4>
+                        <ul>
+                            <li><strong>Objetivo:</strong> ADI declara INconstitucionalidade / ADC declara constitucionalidade</li>
+                            <li><strong>Legitimados:</strong> ADI tem 9 legitimados / ADC tem apenas os mesmos da ADI (após EC 45/2004)</li>
+                            <li><strong>Efeito temporal:</strong> ADI é ex tunc (REGRA) / ADC é ex nunc</li>
+                            <li><strong>MP:</strong> Na ADI intervém / Na ADC atua sempre pela IMPROCEDÊNCIA</li>
+                            <li><strong>Requisito:</strong> ADC exige controvérsia judicial relevante</li>
+                        </ul>
+                    </div>
+
+                    <h3>Quando usar ADC?</h3>
+                    <p>A ADC é utilizada quando há <strong>decisões judiciais contraditórias</strong> sobre a constitucionalidade de uma lei federal. Busca-se uniformizar a jurisprudência e dar segurança jurídica.</p>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+                        <strong><i class="fas fa-lightbulb"></i> Lembre-se:</strong> ADI e ADC têm efeitos equivalentes. A procedência da ADI equivale à improcedência da ADC, e vice-versa. São ações com sinais trocados (ADI- / ADC+).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADPF -->
+        <section id="adpf" class="section">
+            <div class="card highlight-card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-shield-alt"></i> ADPF - Arguição de Descumprimento de Preceito Fundamental</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>Ação constitucional para <strong>proteger preceitos fundamentais</strong> da Constituição contra lesão ou ameaça de lesão.</p>
+
+                    <h3>Características Essenciais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-shield-alt"></i> Objetivo</h4>
+                            <p>Proteger <strong>preceitos fundamentais</strong> da CF</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Quando</h4>
+                            <p>Lesão ou <strong>ameaça de lesão</strong> a preceito fundamental</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Legitimados</h4>
+                            <p><strong>Art. 103 CF</strong> (mesmos da ADI)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-landmark"></i> Competência</h4>
+                            <p><strong>STF</strong> (Supremo Tribunal Federal)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-file-signature"></i> Parecer AGU</h4>
+                            <p><strong>OBRIGATÓRIO</strong></p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-calendar-check"></i> Cabimento</h4>
+                            <p>Lei <strong>anterior</strong> ou <strong>posterior</strong> à CF</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-gavel"></i> Medida Cautelar</h4>
+                            <p><strong>Possível</strong> - Decisão liminar</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-globe"></i> Efeito</h4>
+                            <p><strong>Erga omnes</strong> - Vinculante</p>
+                        </div>
+                    </div>
+
+                    <h3>O que são Preceitos Fundamentais?</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                        <p>Não há definição legal taxativa, mas incluem:</p>
+                        <ul>
+                            <li><strong>Direitos fundamentais</strong> (art. 5º e seguintes)</li>
+                            <li><strong>Princípios fundamentais</strong> (arts. 1º a 4º)</li>
+                            <li><strong>Cláusulas pétreas</strong> (art. 60, §4º)</li>
+                            <li><strong>Princípios sensíveis</strong> (art. 34, VII)</li>
+                        </ul>
+                    </div>
+
+                    <h3>Características Especiais da ADPF</h3>
+                    <ul>
+                        <li><strong>Subsidiariedade:</strong> Só cabe se não houver outro meio eficaz (princípio da subsidiariedade)</li>
+                        <li><strong>Alcance amplo:</strong> Pode questionar lei anterior à CF (direito pré-constitucional)</li>
+                        <li><strong>Atos do Poder Público:</strong> Não se limita a leis, pode questionar atos administrativos</li>
+                        <li><strong>Medida cautelar:</strong> STF pode suspender processos ou efeitos de decisões</li>
+                    </ul>
+
+                    <h3>Diferença para ADI</h3>
+                    <p><strong>ADI:</strong> Questiona lei posterior à CF<br>
+                    <strong>ADPF:</strong> Pode questionar lei anterior ou posterior à CF, tem caráter subsidiário e foca em preceitos fundamentais.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADO -->
+        <section id="ado" class="section">
+            <div class="card highlight-card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-hourglass-half"></i> ADO - Ação Direta de Inconstitucionalidade por Omissão</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>Ação constitucional para <strong>declarar omissão inconstitucional</strong> quando falta medida necessária para tornar efetiva norma constitucional.</p>
+
+                    <h3>Características Essenciais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-ban"></i> Objetivo</h4>
+                            <p>Declarar <strong>omissão inconstitucional</strong> do poder público</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-question-circle"></i> Quando</h4>
+                            <p><strong>Falta lei</strong> que CF exige</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Legitimados</h4>
+                            <p><strong>Art. 103 CF</strong> (mesmos da ADI)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-landmark"></i> Competência</h4>
+                            <p><strong>STF</strong> (Supremo Tribunal Federal)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-file-signature"></i> Parecer AGU</h4>
+                            <p><strong>OBRIGATÓRIO</strong></p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-globe"></i> Efeito</h4>
+                            <p><strong>Erga omnes</strong> - Para todos</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-bell"></i> Consequência</h4>
+                            <p>STF <strong>comunica</strong> ao órgão para legislar</p>
+                        </div>
+                    </div>
+
+                    <h3>Como funciona a ADO?</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                        <p><strong>1.</strong> Alguém legitimado percebe que <strong>falta uma lei</strong> que a Constituição exige</p>
+                        <p><strong>2.</strong> Propõe ADO no STF</p>
+                        <p><strong>3.</strong> STF reconhece a omissão</p>
+                        <p><strong>4.</strong> STF <strong>dá ciência</strong> ao poder competente para que tome providências</p>
+                        <p><strong>5.</strong> Se for órgão administrativo, prazo de <strong>30 dias</strong> para medidas</p>
+                    </div>
+
+                    <h3>Diferença para ADI</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: #f44336; color: white; padding: 1rem; border-radius: 8px;">
+                            <h4>ADI</h4>
+                            <p>Lei <strong>existe</strong> e é inconstitucional</p>
+                            <p><strong>Ação positiva</strong> - lei presente</p>
+                        </div>
+                        <div style="background: var(--accent-orange); color: white; padding: 1rem; border-radius: 8px;">
+                            <h4>ADO</h4>
+                            <p>Lei <strong>não existe</strong> mas deveria existir</p>
+                            <p><strong>Omissão</strong> - lei ausente</p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+                        <strong><i class="fas fa-info-circle"></i> Importante:</strong> O STF não pode criar a lei, apenas declara a omissão e comunica ao órgão competente. Pode, excepcionalmente, regular provisoriamente a matéria.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MI -->
+        <section id="mi" class="section">
+            <div class="card highlight-card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-hand-paper"></i> MI - Mandado de Injunção</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Definição</h3>
+                    <p>Ação constitucional para proteger <strong>direito individual</strong> que não pode ser exercido por <strong>falta de norma regulamentadora</strong>.</p>
+
+                    <h3>Características Essenciais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-user-shield"></i> Objetivo</h4>
+                            <p>Proteger <strong>direito/liberdade individual</strong></p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-ban"></i> Quando</h4>
+                            <p><strong>Ausência de lei</strong> impeça exercer direito constitucional</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-user"></i> Legitimados</h4>
+                            <p><strong>Qualquer pessoa</strong> (física ou jurídica) - Ação INDIVIDUAL</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-gavel"></i> Competência</h4>
+                            <p><strong>Vários tribunais</strong> conforme a autoridade</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-user-tag"></i> Natureza</h4>
+                            <p><strong>Proteção individual</strong> (diferente das outras)</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-users"></i> Efeito</h4>
+                            <p><strong>Inter partes</strong> - Apenas para quem impetra</p>
+                        </div>
+                    </div>
+
+                    <h3>Principal Diferença em relação às outras ações</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4><i class="fas fa-exchange-alt"></i> MI vs ADO, ADI, ADC, ADPF:</h4>
+                        <ul>
+                            <li><strong>Legitimação:</strong> MI é <strong>individual</strong> (qualquer pessoa) / Outras são apenas legitimados do art. 103</li>
+                            <li><strong>Natureza:</strong> MI protege <strong>direito subjetivo</strong> / Outras são controle abstrato</li>
+                            <li><strong>Efeito:</strong> MI tem efeito <strong>inter partes</strong> (só para quem impetra) / Outras têm efeito erga omnes</li>
+                            <li><strong>Competência:</strong> MI pode ser em <strong>vários tribunais</strong> / Outras só no STF</li>
+                        </ul>
+                    </div>
+
+                    <h3>Quando usar MI?</h3>
+                    <p>Exemplo: A CF garante o direito de greve dos servidores públicos (art. 37, VII), mas não há lei regulamentando. Um servidor quer fazer greve mas não consegue por falta de lei. <strong>Impétra MI</strong> para que o tribunal regule provisoriamente esse direito para ele.</p>
+
+                    <h3>Competência do MI</h3>
+                    <ul>
+                        <li><strong>STF:</strong> Se a omissão for de autoridade federal de alto escalão</li>
+                        <li><strong>STJ:</strong> Se a omissão for de autoridade federal comum</li>
+                        <li><strong>Tribunais estaduais:</strong> Se a omissão for de autoridade estadual</li>
+                    </ul>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+                        <strong><i class="fas fa-lightbulb"></i> Resumo:</strong> MI é uma ação <strong>individual</strong> que qualquer pessoa pode usar quando não consegue exercer um direito constitucional por falta de lei. É diferente da ADO que é abstrata e apenas para os legitimados do art. 103.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Efeitos das Decisões -->
+        <section id="efeitos" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-project-diagram"></i> Efeitos das Decisões de Constitucionalidade</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Classificação dos Efeitos</h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #1976d2;">
+                            <h3 style="color: #0d47a1;"><i class="fas fa-clock"></i> EFEITO TEMPORAL</h3>
+                            
+                            <h4><span class="badge badge-info">Ex Tunc</span></h4>
+                            <p><strong>Significado:</strong> "Desde o início" - Retroativo</p>
+                            <p><strong>Quando:</strong> Controle difuso (REGRA), ADI (REGRA)</p>
+                            <p><strong>Consequência:</strong> Lei considerada nula desde a origem, como se nunca tivesse existido</p>
+                            
+                            <h4 style="margin-top: 1rem;"><span class="badge badge-info">Ex Nunc</span></h4>
+                            <p><strong>Significado:</strong> "A partir de agora" - Prospectivo</p>
+                            <p><strong>Quando:</strong> ADC, ADO, ADPF (controle concentrado - REGRA)</p>
+                            <p><strong>Consequência:</strong> Lei deixa de vigorar a partir da decisão, mas efeitos passados são preservados</p>
+                        </div>
+
+                        <div style="background: #fff3e0; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+                            <h3 style="color: #e65100;"><i class="fas fa-users"></i> EFEITO ESPACIAL</h3>
+                            
+                            <h4><span class="badge badge-warning">Inter Partes</span></h4>
+                            <p><strong>Significado:</strong> "Entre as partes"</p>
+                            <p><strong>Quando:</strong> Controle difuso, Mandado de Injunção</p>
+                            <p><strong>Alcance:</strong> Limitado às partes do processo</p>
+                            
+                            <h4 style="margin-top: 1rem;"><span class="badge badge-warning">Erga Omnes</span></h4>
+                            <p><strong>Significado:</strong> "Contra todos" - Efeito geral</p>
+                            <p><strong>Quando:</strong> Controle concentrado (ADI, ADC, ADPF, ADO)</p>
+                            <p><strong>Alcance:</strong> Vincula todos os órgãos do Judiciário e Administração</p>
+                        </div>
+
+                        <div style="background: #e8f5e9; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+                            <h3 style="color: #2e7d32;"><i class="fas fa-link"></i> VINCULAÇÃO</h3>
+                            
+                            <h4><span class="badge badge-success">Vinculante</span></h4>
+                            <p><strong>Significado:</strong> Vincula todos os órgãos do Poder Judiciário e Administração Pública</p>
+                            <p><strong>Quando:</strong> Controle concentrado</p>
+                            <p><strong>Consequência:</strong> Decisão deve ser obedecida por todos</p>
+                            
+                            <h4 style="margin-top: 1rem;"><span class="badge badge-success">Não Vinculante</span></h4>
+                            <p><strong>Significado:</strong> Não obriga automaticamente outros juízes</p>
+                            <p><strong>Quando:</strong> Controle difuso</p>
+                            <p><strong>Consequência:</strong> Outros juízes podem decidir diferente</p>
+                        </div>
+                    </div>
+
+                    <h3>Quadro Comparativo - Efeitos por Tipo de Controle</h3>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Efeito Temporal</th>
+                                    <th>Efeito Espacial</th>
+                                    <th>Vinculação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Controle Difuso</strong></td>
+                                    <td><span class="badge badge-info">Ex tunc</span> (retroativo)</td>
+                                    <td><span class="badge badge-warning">Inter partes</span></td>
+                                    <td>Não vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Controle Concentrado (ADC)</strong></td>
+                                    <td><span class="badge badge-info">Ex nunc</span> (prospectivo)</td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td>Vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ADI</strong></td>
+                                    <td><span class="badge badge-info">Ex tunc</span> (REGRA)</td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td>Vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ADPF</strong></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td>Vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ADO</strong></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td>Vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mandado de Injunção</strong></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-warning">Inter partes</span></td>
+                                    <td>Não vinculante</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Modulação de Efeitos (Art. 27 da Lei 9.868/99)</h3>
+                    <div class="info-box">
+                        <p><strong><i class="fas fa-info-circle"></i> Importante:</strong> O STF pode, por <strong>2/3 dos votos</strong>, restringir os efeitos da declaração ou decidir que ela só tenha eficácia a partir de momento futuro, em razão de <strong>segurança jurídica</strong> ou <strong>excepcional interesse social</strong>.</p>
+                        <p>Isso significa que a REGRA pode ser alterada pelo STF em casos excepcionais.</p>
+                    </div>
+
+                    <h3>Repristinação</h3>
+                    <p><strong>Conceito:</strong> Restauração automática da vigência de lei anteriormente revogada.</p>
+                    <p><strong>Quando ocorre:</strong> Na ADI, quando o STF declara inconstitucional uma lei que havia revogado outra lei, a lei anterior <strong>volta a vigorar</strong> automaticamente (salvo manifestação contrária do STF).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabela Comparativa -->
+        <section id="comparacao" class="section">
+            <div class="card expanded">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2><i class="fas fa-table"></i> Tabela Comparativa Completa: ADI x ADC x ADPF x ADO x MI</h2>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="card-content">
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Aspecto</th>
+                                    <th>ADI</th>
+                                    <th>ADC</th>
+                                    <th>ADPF</th>
+                                    <th>ADO</th>
+                                    <th>MI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Objetivo</strong></td>
+                                    <td>Declarar INconstitucionalidade</td>
+                                    <td>Declarar CONSTITUCIONALidade</td>
+                                    <td>Proteger preceitos fundamentais</td>
+                                    <td>Declarar omissão inconstitucional</td>
+                                    <td>Proteger direito individual por falta de norma</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Legitimados</strong></td>
+                                    <td>Art. 103 (9 legitimados)</td>
+                                    <td>Art. 103 (mesmos da ADI após EC 45)</td>
+                                    <td>Art. 103 (mesmos da ADI)</td>
+                                    <td>Art. 103 (mesmos da ADI)</td>
+                                    <td><strong>Qualquer pessoa</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Competência</strong></td>
+                                    <td>STF</td>
+                                    <td>STF</td>
+                                    <td>STF</td>
+                                    <td>STF</td>
+                                    <td>Vários tribunais conforme autoridade</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Parecer AGU</strong></td>
+                                    <td><strong>OBRIGATÓRIO</strong> (defende lei)</td>
+                                    <td><strong>OBRIGATÓRIO</strong> (defende lei)</td>
+                                    <td><strong>OBRIGATÓRIO</strong></td>
+                                    <td><strong>OBRIGATÓRIO</strong></td>
+                                    <td>Não se aplica</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ministério Público</strong></td>
+                                    <td>Deve intervir</td>
+                                    <td>Sempre CONTRÁRIO</td>
+                                    <td>Deve intervir</td>
+                                    <td>Deve intervir</td>
+                                    <td>Pode intervir</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Efeito Temporal</strong></td>
+                                    <td><span class="badge badge-info">Ex tunc</span> (REGRA)</td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                    <td><span class="badge badge-info">Ex nunc</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Efeito Espacial</strong></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td><span class="badge badge-warning">Erga omnes</span></td>
+                                    <td><span class="badge badge-warning">Inter partes</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vinculação</strong></td>
+                                    <td>Vinculante</td>
+                                    <td>Vinculante</td>
+                                    <td>Vinculante</td>
+                                    <td>Vinculante</td>
+                                    <td>Não vinculante</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Repristinação</strong></td>
+                                    <td><strong>SIM</strong></td>
+                                    <td>Não</td>
+                                    <td>Possível</td>
+                                    <td>Não se aplica</td>
+                                    <td>Não se aplica</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Problema</strong></td>
+                                    <td>Lei <strong>existe</strong> e é inconstitucional</td>
+                                    <td>Dúvida sobre constitucionalidade de lei</td>
+                                    <td>Lesão a preceito fundamental</td>
+                                    <td>Lei <strong>não existe</strong> mas deveria</td>
+                                    <td>Não consigo exercer direito por falta de lei</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Natureza</strong></td>
+                                    <td>Controle abstrato</td>
+                                    <td>Controle abstrato</td>
+                                    <td>Controle abstrato</td>
+                                    <td>Controle abstrato</td>
+                                    <td><strong>Proteção subjetiva individual</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 2rem;">Fluxograma: Como Escolher a Ação?</h3>
+                    <div class="flowchart">
+                        <div class="flowchart-step">
+                            <h4><i class="fas fa-question-circle"></i> PASSO 1: A lei existe?</h4>
+                            <p><strong>NÃO EXISTE</strong> → Vá para o Passo 2</p>
+                            <p><strong>SIM, EXISTE</strong> → Vá para o Passo 3</p>
+                        </div>
+
+                        <div class="flowchart-step">
+                            <h4><i class="fas fa-hourglass-half"></i> PASSO 2: Lei não existe</h4>
+                            <p><strong>Você é pessoa física/jurídica comum?</strong> → <span class="badge badge-warning">MANDADO DE INJUNÇÃO (MI)</span></p>
+                            <p><strong>Você é legitimado do art. 103?</strong> → <span class="badge badge-warning">ADO (Ação Direta por Omissão)</span></p>
+                        </div>
+
+                        <div class="flowchart-step">
+                            <h4><i class="fas fa-file-alt"></i> PASSO 3: Lei existe - qual o problema?</h4>
+                            <p><strong>Lei é INCONSTITUCIONAL</strong> → <span class="badge badge-info">ADI</span></p>
+                            <p><strong>Há DÚVIDA se lei é constitucional (controvérsia)</strong> → <span class="badge badge-info">ADC</span></p>
+                            <p><strong>Viola PRECEITO FUNDAMENTAL</strong> → <span class="badge badge-info">ADPF</span></p>
+                        </div>
+
+                        <div class="flowchart-step">
+                            <h4><i class="fas fa-info-circle"></i> PASSO 4: Lei é anterior à CF/88?</h4>
+                            <p><strong>SIM, anterior à CF/88</strong> → <span class="badge badge-success">ADPF</span> (única que aceita lei pré-constitucional)</p>
+                            <p><strong>NÃO, posterior à CF/88</strong> → ADI, ADC ou ADPF conforme o caso</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="section">
+            <div class="quiz-container">
+                <div id="quizStart" class="quiz-start">
+                    <h2><i class="fas fa-question-circle"></i> Quiz de Controle de Constitucionalidade</h2>
+                    <p>Teste seus conhecimentos com 30 questões sobre todo o conteúdo estudado!</p>
+                    <p><strong>Distribuição:</strong></p>
+                    <ul style="text-align: left; display: inline-block;">
+                        <li>Aulas 1-7: 10 questões (conceitos fundamentais)</li>
+                        <li>Aula 8: 20 questões (ADI, ADC, ADPF, ADO, MI e temas críticos)</li>
+                    </ul>
+                    <button class="btn" onclick="startQuiz()"><i class="fas fa-play"></i> Iniciar Quiz</button>
+                </div>
+
+                <div id="quizQuestions" style="display: none;"></div>
+
+                <div id="quizResults" class="quiz-results" style="display: none;">
+                    <h2><i class="fas fa-trophy"></i> Resultado do Quiz</h2>
+                    <div class="score-circle">
+                        <div>
+                            <div id="scorePercentage">0%</div>
+                            <small id="scoreText">0/30</small>
+                        </div>
+                    </div>
+                    <h3 id="scoreMessage"></h3>
+                    <div class="nav-buttons">
+                        <button class="btn" onclick="reviewQuiz()"><i class="fas fa-redo"></i> Revisar Questões</button>
+                        <button class="btn btn-secondary" onclick="restartQuiz()"><i class="fas fa-sync"></i> Refazer Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Quiz Data
+        const quizData = [
+            // Aula 1 - 2 questões
+            {
+                question: "Uma lei federal que discrimina mulheres em relação a homens para mesma função pode ser declarada inconstitucional por:",
+                options: ["Inconstitucionalidade formal", "Inconstitucionalidade material", "Falta de pressupostos", "Todos os anteriores"],
+                answer: 1,
+                explanation: "Desrespeita conteúdo material da CF (igualdade). Formal seria vício no processo legislativo."
+            },
+            {
+                question: "A Constituição brasileira de 1988 é classificada como:",
+                options: ["Flexível", "Rígida", "Semi-rígida", "Costumeira"],
+                answer: 1,
+                explanation: "CF/88 é rígida - exige processo especial (art. 60) para alteração. Isso justifica o controle de constitucionalidade."
+            },
+            // Aula 2 - 2 questões
+            {
+                question: "O poder constituinte ORIGINÁRIO é:",
+                options: ["Limitado", "Ilimitado e soberano", "Regulado por lei", "Subordinado ao poder constituinte derivado"],
+                answer: 1,
+                explanation: "Poder constituinte originário é extraordinário, ilimitado, autônomo e soberano. Cria nova CF."
+            },
+            {
+                question: "A supremacia constitucional significa que:",
+                options: ["A lei ordinária é superior à Constituição", "A Constituição é norma suprema e todas as outras devem estar em conformidade", "O Presidente pode mudar a Constituição", "Não há hierarquia entre normas"],
+                answer: 1,
+                explanation: "A Constituição é a norma suprema do ordenamento jurídico. Todas as demais normas devem estar em conformidade com ela."
+            },
+            // Aula 3 - 2 questões
+            {
+                question: "Lei que invade competência de outro ente (ex: município legisla sobre direito penal) viola inconstitucionalidade:",
+                options: ["Material", "Formal orgânica", "Formal procedimental", "Por omissão"],
+                answer: 1,
+                explanation: "Formal ORGÂNICA: vício de competência legislativa (quem não podia legislou)."
+            },
+            {
+                question: "Qual desses é exemplo de vício FORMAL PROCEDIMENTAL?",
+                options: ["Lei que discrimina por raça", "Lei votada sem quórum necessário", "Lei que invade competência da União", "Decreto sem fundamentação"],
+                answer: 1,
+                explanation: "Formal PROCEDIMENTAL: violação do procedimento legislativo (quórum, votação, etc). Formal ORGÂNICA: competência."
+            },
+            // Aula 4 - 2 questões
+            {
+                question: "O tipo de controle PREVENTIVO é realizado por:",
+                options: ["STF em ADI", "Comissão de Constituição e Justiça do Congresso", "Presidente da República apenas", "OAB"],
+                answer: 1,
+                explanation: "Controle preventivo: CCJ rejeita projeto antes de lei ser sancionada. Preventivo = antes."
+            },
+            {
+                question: "No controle DIFUSO de constitucionalidade, os efeitos são:",
+                options: ["Ex nunc, erga omnes", "Ex tunc, inter partes", "Ex nunc, inter partes", "Ex tunc, erga omnes"],
+                answer: 1,
+                explanation: "Difuso: ex tunc (retroativo), inter partes (entre as partes), não vinculante."
+            },
+            // Aula 5 - 2 questões
+            {
+                question: "No Brasil, o modelo de controle de constitucionalidade adotado é:",
+                options: ["Difuso", "Concentrado", "Misto/Híbrido", "Preventivo"],
+                answer: 2,
+                explanation: "Brasil combina controle difuso (qualquer juiz) e concentrado (STF). Sistema misto."
+            },
+            {
+                question: "Qual poder realiza o controle de constitucionalidade NO BRASIL?",
+                options: ["Executivo", "Legislativo", "Judiciário", "Todos igualmente"],
+                answer: 2,
+                explanation: "Judiciário exerce controle (preventivo é CCJ, repressivo é juízes/STF). Brasil adota judicial review."
+            },
+            // Aula 8 - ADI (3 questões)
+            {
+                question: "Na ADI, o parecer da AGU é:",
+                options: ["Meramente consultivo", "Facultativo", "Obrigatório - art. 103, §3 (defende lei)", "Vinculante"],
+                answer: 2,
+                explanation: "AGU deve intervir na ADI obrigatoriamente (art. 103, §3) como defensora da lei questionada."
+            },
+            {
+                question: "A repristinação é efeito específico da:",
+                options: ["ADC", "ADPF", "ADI", "MI"],
+                answer: 2,
+                explanation: "ADI pode ter efeito repristinatório: lei anterior volta a vigorar quando lei declarada inconstitucional é anulada."
+            },
+            {
+                question: "O efeito temporal da ADI, como REGRA, é:",
+                options: ["Ex nunc (prospectivo)", "Ex tunc (retroativo)", "Inter partes", "Apenas para o futuro"],
+                answer: 1,
+                explanation: "ADI tem efeito ex tunc como REGRA - a lei é considerada nula desde o início. STF pode modular."
+            },
+            // Aula 8 - ADC (2 questões)
+            {
+                question: "Qual a diferença fundamental entre ADI e ADC?",
+                options: ["ADI é concentrada, ADC é difusa", "ADI declara inconstitucionalidade, ADC declara constitucionalidade", "ADI é federal, ADC é estadual", "Não há diferença prática"],
+                answer: 1,
+                explanation: "ADI: declara inconstitucionalidade. ADC: declara constitucionalidade (protege lei de decisões difusas contraditórias)."
+            },
+            {
+                question: "Na ADC, o Ministério Público atua:",
+                options: ["Sempre a favor da lei", "Sempre contrário à pretensão", "Não participa", "Apenas como consultor"],
+                answer: 1,
+                explanation: "Na ADC, o MP atua sempre pela IMPROCEDÊNCIA, ou seja, contrário à declaração de constitucionalidade."
+            },
+            // Aula 8 - ADPF (2 questões)
+            {
+                question: "Qual a natureza jurídica da ADPF?",
+                options: ["Ação para declarar inconstitucionalidade de lei", "Ação para proteger direitos fundamentais contra lesão", "Ação para executar sentença", "Ação para anular contrato"],
+                answer: 1,
+                explanation: "ADPF (Arguição de Descumprimento): protege preceito fundamental em risco de lesão (lei anterior ou posterior à CF)."
+            },
+            {
+                question: "A ADPF pode ser usada para questionar:",
+                options: ["Apenas leis posteriores à CF/88", "Apenas leis anteriores à CF/88", "Leis anteriores ou posteriores à CF/88", "Apenas decretos"],
+                answer: 2,
+                explanation: "ADPF pode questionar lei anterior (pré-constitucional) ou posterior à CF/88. Diferença importante em relação à ADI."
+            },
+            // Aula 8 - ADO (2 questões)
+            {
+                question: "A ADO (Ação Direta por Omissão) é utilizada quando:",
+                options: ["Lei é contrária à CF", "Falta norma que CF exige", "Juiz age sem competência", "Lei prejudica alguém"],
+                answer: 1,
+                explanation: "ADO: combate omissão inconstitucional (falta de lei que deveria existir conforme CF)."
+            },
+            {
+                question: "Quando o STF declara procedente uma ADO, ele:",
+                options: ["Cria a lei automaticamente", "Dá ciência ao poder competente para legislar", "Anula a lei existente", "Nada faz"],
+                answer: 1,
+                explanation: "STF não pode criar a lei, apenas declara a omissão e comunica ao órgão competente para que legisle."
+            },
+            // Aula 8 - MI (2 questões)
+            {
+                question: "O Mandado de Injunção (MI) diferencia-se das outras ações porque:",
+                options: ["Só cabe no STF", "É individual e defende direito específico por falta de norma", "Sempre vincula", "Só cabe para lei federal"],
+                answer: 1,
+                explanation: "MI é proteção individual (pessoa física/jurídica) que não consegue exercer direito por falta de lei. Pode ser impetrado em qualquer tribunal."
+            },
+            {
+                question: "Quem pode impetrar Mandado de Injunção?",
+                options: ["Apenas os legitimados do art. 103", "Apenas o Presidente", "Qualquer pessoa (física ou jurídica)", "Apenas a OAB"],
+                answer: 2,
+                explanation: "MI é ação INDIVIDUAL - qualquer pessoa pode impetrar para proteger seu direito que não pode exercer por falta de norma."
+            },
+            // Aula 8 - Efeitos (3 questões)
+            {
+                question: "No controle concentrado, como REGRA GERAL, os efeitos são:",
+                options: ["Ex tunc, inter partes, não vinculantes", "Ex nunc, erga omnes, vinculantes", "Ex tunc, erga omnes, vinculantes", "Ex nunc, inter partes, não vinculantes"],
+                answer: 1,
+                explanation: "Concentrado: ex nunc (prospectivo), erga omnes (para todos), vinculante (obriga). REGRA GERAL."
+            },
+            {
+                question: "Efeito 'erga omnes' significa:",
+                options: ["Apenas entre as partes", "Para todos, vinculante", "Apenas para o autor", "Apenas para o STF"],
+                answer: 1,
+                explanation: "Erga omnes = 'contra todos'. A decisão vale para todos, não só para as partes do processo."
+            },
+            {
+                question: "Efeito 'ex tunc' significa:",
+                options: ["A partir de agora", "Desde o início, retroativo", "Apenas para o futuro", "Sem efeito"],
+                answer: 1,
+                explanation: "Ex tunc = 'desde então'. Efeito retroativo - a lei é considerada nula desde sua origem."
+            },
+            // Aula 8 - Controle difuso vs concentrado (2 questões)
+            {
+                question: "No controle CONCENTRADO, quem pode propor a ação?",
+                options: ["Qualquer juiz", "Apenas os legitimados do art. 103", "Qualquer pessoa", "Apenas o Presidente"],
+                answer: 1,
+                explanation: "Controle concentrado: apenas os 9 legitimados do art. 103 CF podem propor (ADI, ADC, ADPF, ADO)."
+            },
+            {
+                question: "A origem do controle DIFUSO é:",
+                options: ["Áustria (sistema austríaco)", "Brasil (sistema brasileiro)", "EUA (sistema americano - caso Marbury vs Madison)", "França (sistema francês)"],
+                answer: 2,
+                explanation: "Controle difuso: origem EUA, 1803, caso Marbury vs Madison com juiz Marshall. Sistema americano."
+            },
+            // Aula 8 - Legitimados art. 103 (2 questões)
+            {
+                question: "Legitimados UNIVERSAIS do art. 103 CF para ADI (não precisam de pertinência temática):",
+                options: ["Presidente, PGR, OAB, Partido com CN, Confederação Sindical", "Presidente, Governador, PGR", "Presidente, PGR, OAB, Partido com CN, Mesa do Senado, Mesa da Câmara", "Apenas Presidente e PGR"],
+                answer: 2,
+                explanation: "Universais: Presidente, PGR, OAB, Partido (CN), Mesa Câmara, Mesa Senado. Especiais: Governador*, Mesa Assembléia*, Confederação*."
+            },
+            {
+                question: "A legitimação especial exigida para Governador, Mesa de Assembléia e Confederação é:",
+                options: ["Maioria de votos", "Pertinência temática", "Parecer técnico", "Aprovação do STF"],
+                answer: 1,
+                explanation: "Art. 97 CF: Governador, Mesa Assembléia e Confederação (3 com *) precisam demonstrar pertinência temática."
+            },
+            // Aula 8 - Parecer da AGU (1 questão)
+            {
+                question: "O parecer da AGU nas ações de controle concentrado (ADI, ADC, ADO) é:",
+                options: ["Facultativo", "Obrigatório, defendendo a lei (Art. 103, §3)", "Apenas consultivo", "Não é necessário"],
+                answer: 1,
+                explanation: "Art. 103, §3 CF: AGU deve se manifestar OBRIGATORIAMENTE defendendo a validade da lei ou ato normativo."
+            },
+            // Aula 8 - Modelo brasileiro/qual poder controla (1 questão)
+            {
+                question: "O guardião da Constituição no Brasil é:",
+                options: ["Presidente da República", "Congresso Nacional", "Supremo Tribunal Federal (STF)", "Advocacia-Geral da União"],
+                answer: 2,
+                explanation: "O STF é o guardião da Constituição, exercendo tanto o controle difuso quanto o concentrado."
+            },
+            {
+                question: "A classificação completa da CF/88 é:",
+                options: ["Outorgada, consuetudinária, flexível", "Promulgada, escrita, rígida, formal, dogmática", "Cesarista, costumeira, material", "Ditatorial, sintética, breve"],
+                answer: 1,
+                explanation: "CF/88: Promulgada (democrática), Escrita (formal), RÍGIDA (exige art. 60), Formal, Dogmática (princípios)."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        // Theme Toggle
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            // Save to variable instead of localStorage
+            window.currentTheme = newTheme;
+        }
+
+        // Initialize theme from variable
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.currentTheme) {
+                document.documentElement.setAttribute('data-theme', window.currentTheme);
+            }
+        });
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Section Navigation
+        function navigateToSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Card Toggle
+        function toggleCard(element) {
+            const card = element.closest('.card');
+            card.classList.toggle('expanded');
+        }
+
+        // Progress Tracking
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.section-check');
+            const checked = document.querySelectorAll('.section-check:checked').length;
+            const total = checkboxes.length;
+            const percentage = (checked / total) * 100;
+            
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // Back to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // Quiz Functions
+        function startQuiz() {
+            currentQuestion = 0;
+            userAnswers = [];
+            score = 0;
+            
+            document.getElementById('quizStart').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'none';
+            document.getElementById('quizQuestions').style.display = 'block';
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const container = document.getElementById('quizQuestions');
+            const q = quizData[currentQuestion];
+            
+            let html = `
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-number">Questão ${currentQuestion + 1} de ${quizData.length}</span>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    <ul class="options">
+            `;
+            
+            q.options.forEach((option, index) => {
+                html += `<li class="option" onclick="selectOption(${index})">${option}</li>`;
+            });
+            
+            html += `
+                    </ul>
+                    <div class="explanation" id="explanation"></div>
+                    <div class="nav-buttons">
+            `;
+            
+            if (currentQuestion > 0) {
+                html += `<button class="btn btn-secondary" onclick="previousQuestion()"><i class="fas fa-arrow-left"></i> Anterior</button>`;
+            }
+            
+            html += `
+                        <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                            ${currentQuestion < quizData.length - 1 ? '<i class="fas fa-arrow-right"></i> Próxima' : '<i class="fas fa-check"></i> Finalizar'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Restore previous answer if exists
+            if (userAnswers[currentQuestion] !== undefined) {
+                selectOption(userAnswers[currentQuestion], true);
+            }
+        }
+
+        function selectOption(index, skipValidation = false) {
+            const options = document.querySelectorAll('.option');
+            const q = quizData[currentQuestion];
+            
+            // Clear previous selections
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark selected
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+            
+            if (!skipValidation) {
+                // Show correct/incorrect
+                if (index === q.answer) {
+                    options[index].classList.remove('selected');
+                    options[index].classList.add('correct');
+                } else {
+                    options[index].classList.add('incorrect');
+                    options[q.answer].classList.add('correct');
+                }
+                
+                // Show explanation
+                const explanation = document.getElementById('explanation');
+                explanation.innerHTML = `<strong><i class="fas fa-lightbulb"></i> Explicação:</strong> ${q.explanation}`;
+                explanation.classList.add('show');
+            }
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            // Calculate score
+            score = 0;
+            quizData.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) {
+                    score++;
+                }
+            });
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            
+            document.getElementById('quizQuestions').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'block';
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('scoreText').textContent = `${score}/${quizData.length}`;
+            
+            const scoreCircle = document.querySelector('.score-circle');
+            let message = '';
+            
+            if (percentage >= 90) {
+                scoreCircle.style.background = '#4caf50';
+                message = 'Excelente! Você domina o conteúdo!';
+            } else if (percentage >= 70) {
+                scoreCircle.style.background = '#ff9800';
+                message = 'Muito bom! Continue estudando!';
+            } else if (percentage >= 50) {
+                scoreCircle.style.background = '#2196f3';
+                message = 'Bom trabalho! Revise os pontos fracos.';
+            } else {
+                scoreCircle.style.background = '#f44336';
+                message = 'Continue estudando! Você pode melhorar!';
+            }
+            
+            document.getElementById('scoreMessage').textContent = message;
+        }
+
+        function reviewQuiz() {
+            currentQuestion = 0;
+            document.getElementById('quizResults').style.display = 'none';
+            document.getElementById('quizQuestions').style.display = 'block';
+            showQuestion();
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
